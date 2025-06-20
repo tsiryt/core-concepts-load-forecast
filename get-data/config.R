@@ -1,0 +1,1 @@
+path_hourly_data <- "data/household_data_60min_singleindex.csv"
