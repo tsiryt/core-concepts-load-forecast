@@ -7,6 +7,10 @@ source(here::here("get-data", "config.R"))
 tryCatch(
   {
     if (!file.exists(here::here(path_hourly_data_long))) {
+      if (!file.exists(here::here(path_hourly_data))) {
+        log_error("Le fichier '{path_hourly_data}' n'existe pas. Veuillez le telecharger.")
+        stop()
+      }
       log_tictoc("Lecture du fichier {path_hourly_data}")
       household_data <- read_delim(here::here(path_hourly_data))
 
