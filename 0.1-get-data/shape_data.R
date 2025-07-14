@@ -40,3 +40,37 @@ tryCatch(
     beep("wilhelm")
   }
 )
+
+tryCatch(
+  {
+    if (!file.exists(here::here(path_ref_units))) {
+      if (!file.exists(here::here(path_hourly_data_long))) {
+        log_error("Le fichier '{path_hourly_data_long}' n'existe pas. Veuillez le creer.")
+        stop()
+      }
+      log_tictoc("Lecture du fichier {path_hourly_data_long}")
+      household_data_long <- read_delim(here::here(path_hourly_data_long))
+
+      ref_units <- household_data_long %>%
+        group_by(household_type, id_household, energy_type, id_ener_source) %>%
+        mutate(id_ener_source = if_else(is.na(id_ener_source), "", as.character(id_ener_source))) %>%
+        summarise(nb_rows = n()) %>%
+        select(household_type, id_household, energy_type, id_ener_source) %>%
+        ungroup() %>%
+        mutate(id_unit = row_number())
+      ref_units %>%
+        write_csv(here::here(path_ref_units))
+      log_tictoc("Reference des unites ecrite dans {path_ref_units}")
+      beep("complete")
+    } else {
+      log_info("Fichier {path_ref_units} deja existant. Rien a faire.")
+      beep("ready")
+    }
+  },
+  error = function(cond) {
+    msg_error = "Erreur en ecrivant le fichier {path_ref_units}.
+    Voici le message d'erreur initial : {cond}"
+    log_error(msg_error)
+    beep("wilhelm")
+  }
+)

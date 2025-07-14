@@ -1,5 +1,6 @@
 path_hourly_data <- "0.0-data/household_data_60min_singleindex.csv"
 path_hourly_data_long <- "0.0-data/household_data_60min_singleindex_long.csv"
+path_ref_units <- "0.0-data/household_data_ref_units.csv"
 regex_col_names <- "DE_KN_([[:alpha:]]+)([[:digit:]]?)_([[:alpha:]|_(?=[:alpha:]+)]+)([[:digit:]])?"
 cols_ener <- c(
   "DE_KN_industrial1_grid_import",
