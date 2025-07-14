@@ -3,6 +3,7 @@ here::i_am("1-exercises/6-prep_analysis_feature_generation/main.R")
 source(here::here("libraries.R"))
 source(here::here("config.R"))
 source(here::here("helpers.R"))
+source(here::here("time_series_analysis.R"))
 
 source(here::here("1-exercises/6-prep_analysis_feature_generation/config.R"))
 source(here::here("0.1-get-data/config.R"))
@@ -39,15 +40,31 @@ household_data_long %>%
   theme_light()
 
 ## Plot the autocorr & partial autocorr
-household_data %>%
-  select(where(is.numeric)) %>%
-  acf(type = "correlation")
+plot_correlation_fun(
+  household_data,
+  c("DE_KN_industrial1_grid_import", "DE_KN_industrial1_pv_1", "DE_KN_industrial1_pv_2"),
+  "utc_timestamp",
+  lag_max = 24 * 14,
+  type = "acf"
+)
 
-household_data %>%
-  select(where(is.numeric)) %>%
-  acf(type = "partial")
+plot_correlation_fun(
+  household_data,
+  c("DE_KN_industrial1_grid_import", "DE_KN_industrial1_pv_1", "DE_KN_industrial1_pv_2"),
+  "utc_timestamp",
+  lag_max = 24 * 14,
+  type = "pacf"
+)
+
+
 ## At what lags is the autocorr strongest ?
-# Data is highly trended
+log_trace("ACF / Grid import : max lag a J-0 etau J-7 + decroissance. Tres correle a H+24")
+log_trace("ACF / Grid import : max lag a H-24, min a H-12. Ce pattern cycle")
+log_trace("ACF / Grid import : max lag a H-24, min a H-12. Ce pattern cycle")
+
+log_trace("PACF / Grid import : Lag positif fort jusqu'a H-3. Negatif de H+4 a H-6. Positif jusqu'a H-24. Peu significatif au dela de J-8.")
+log_trace("PACF / Grid PV 1 : Negatif de H-1 a H-12 puis positif jusqu'a H-23. Ce pattern cycle. Dernier lag significatif a J-10")
+log_trace("PACF / Grid PV 2 : Negatif de H-1 a H-12 puis positif jusqu'a H-23. Ce pattern cycle. Dernier lag significatif a J-10")
 
 ## Plot a scatter plot of the demand against lags of the demand series.
 ## Are relationships linear ? If so, calculate adjusted coeffs of determination.
