@@ -1,8 +1,8 @@
-here::i_am("get-data/shape_data.R")
+here::i_am("0.1-get-data/shape_data.R")
 
 source(here::here("libraries.R"))
 source(here::here("config.R"))
-source(here::here("get-data", "config.R"))
+source(here::here("0.1-get-data", "config.R"))
 
 tryCatch(
   {

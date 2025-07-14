@@ -14,5 +14,5 @@ layout_wrap_long_lines <- layout_glue_generator(
 )
 attr(layout_wrap_long_lines, "generator") <- quote(layout_wrap_long_lines())
 
-log_layout(layout_wrap_long_lines)
 log_threshold(INFO)
+log_layout(layout_wrap_long_lines)
