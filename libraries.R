@@ -10,3 +10,4 @@ library(glue)
 library(purrr)
 
 conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflicts_prefer(dplyr::lag)

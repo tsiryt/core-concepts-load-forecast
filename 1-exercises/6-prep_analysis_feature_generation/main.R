@@ -10,7 +10,7 @@ source(here::here("0.1-get-data/config.R"))
 # Take a demand time series. 
 ref_units <- get_energy_unit_config(chosen_units, here::here(path_ref_units))
 
-household_data <-
+household_data_long <-
   read_delim(here::here(path_hourly_data_long), show_col_types = FALSE) %>%
   right_join(
     ref_units,
@@ -18,24 +18,34 @@ household_data <-
   ) %>%
   filter(!is.na(ener_kWh))
 
+log_debug("To use acf and pacf func with multiple time series, wide format is better.")
+log_debug("The selected columns were chosen after deciding the value of chosen_units")
+household_data <-
+  read_delim(here::here(path_hourly_data), show_col_types = FALSE) %>%
+  select(utc_timestamp, DE_KN_industrial1_grid_import, DE_KN_industrial1_pv_1, DE_KN_industrial1_pv_2) %>%
+  mutate(across(where(is.numeric), ~ . - lag(., 1))) %>% # l'energie dans la donnee brute est cumulee
+  filter(if_all(where(is.numeric), ~ !is.na(.)))
+
+
 ## Simple plot
-household_data %>%
+household_data_long %>%
   ggplot(aes(x = utc_timestamp)) +
   geom_line(aes(y = ener_kWh, color = id_unit, linetype = energy_type), linewidth = 1.6) +
   scale_y_continuous(
     breaks = scales::breaks_pretty(7),
     labels = scales::label_number()
   ) +
+  scale_x_datetime(date_breaks = "3 month") +
   theme_light()
 
 ## Plot the autocorr & partial autocorr
 household_data %>%
-  select(ener_kWh) %>%
-  acf(type = "correlation", 2400)
+  select(where(is.numeric)) %>%
+  acf(type = "correlation")
 
 household_data %>%
-  select(ener_kWh) %>%
-  acf(type = "partial", 2400)
+  select(where(is.numeric)) %>%
+  acf(type = "partial")
 ## At what lags is the autocorr strongest ?
 # Data is highly trended
 
