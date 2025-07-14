@@ -1,12 +1,12 @@
 #' Cree un df contenant les parametres des time series dont les id sont passes en parametres.
 #' 
-#' @param list_config int vector.
+#' @param list_units int vector.
 #' @param path_unit_ref string.
 #' 
 #' @return dataframe.
-get_energy_unit_config <- function(list_config, path_unit_ref) {
+get_energy_unit_config <- function(list_units, path_unit_ref) {
   df_unit_ref <- read_delim(path_unit_ref, show_col_types = FALSE) %>%
-    filter(id_unit %in% list_config) %>%
+    filter(id_unit %in% list_units) %>%
     mutate(id_unit = as.factor(id_unit)) %>%
     select(id_unit, !id_unit)
 

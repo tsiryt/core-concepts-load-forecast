@@ -15,7 +15,8 @@ household_data <-
   right_join(
     ref_units,
     by = c("household_type", "id_household", "energy_type", "id_ener_source")
-  )
+  ) %>%
+  filter(!is.na(ener_kWh))
 
 ## Simple plot
 household_data %>%
@@ -28,7 +29,16 @@ household_data %>%
   theme_light()
 
 ## Plot the autocorr & partial autocorr
+household_data %>%
+  select(ener_kWh) %>%
+  acf(type = "correlation", 2400)
+
+household_data %>%
+  select(ener_kWh) %>%
+  acf(type = "partial", 2400)
 ## At what lags is the autocorr strongest ?
+# Data is highly trended
+
 ## Plot a scatter plot of the demand against lags of the demand series.
 ## Are relationships linear ? If so, calculate adjusted coeffs of determination.
 ## Which lags give the biggest values ?
