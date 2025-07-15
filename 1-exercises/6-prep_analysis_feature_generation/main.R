@@ -67,5 +67,16 @@ log_trace("PACF / Grid PV 1 : Negatif de H-1 a H-12 puis positif jusqu'a H-23. C
 log_trace("PACF / Grid PV 2 : Negatif de H-1 a H-12 puis positif jusqu'a H-23. Ce pattern cycle. Dernier lag significatif a J-10")
 
 ## Plot a scatter plot of the demand against lags of the demand series.
+household_data_with_lags <- household_data_long %>%
+  group_by(across(all_of(cols_grouping))) %>%
+  lag_many("ener_kWh", lags_to_create) %>%
+  select(utc_timestamp, id_unit, all_of(cols_grouping), starts_with("ener_kWh"))
+
+household_data_with_lags %>%
+  ungroup() %>%
+  filter(id_unit == 1) %>%
+  select(starts_with("ener_kWh"), !ener_kWh_cumul) %>%
+  GGally::ggpairs()
+
 ## Are relationships linear ? If so, calculate adjusted coeffs of determination.
 ## Which lags give the biggest values ?
