@@ -75,8 +75,20 @@ household_data_with_lags <- household_data_long %>%
 household_data_with_lags %>%
   ungroup() %>%
   filter(id_unit == 1) %>%
-  select(starts_with("ener_kWh"), !ener_kWh_cumul) %>%
+  select(starts_with("ener_kWh")) %>%
+  select(!ener_kWh_cumul) %>%
   GGally::ggpairs()
 
 ## Are relationships linear ? If so, calculate adjusted coeffs of determination.
+# Relationship are not linear beyond lag 3.
+
 ## Which lags give the biggest values ?
+# 168 = 0.803
+# 24 = 0.749
+# between 24 and 168 : 0.61 - 0.66
+# 6 = 0.735
+# 3 = 0.858
+# 1 = 0.932
+# 2 = 0.894
+# 4 = 0.812
+# 5 = 0.771
