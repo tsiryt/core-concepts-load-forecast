@@ -42,6 +42,12 @@ household_data_with_lags %>%
     estimate = forecast
   ) %>%
   print(width = Inf)
+# A tibble: 3 x 5
+#   household_type energy_type model            .metric .estimate
+#   <chr>          <chr>       <chr>            <chr>       <dbl>
+# 1 industrial     grid_import ener_kWh_lag_1   rmse         6.70
+# 2 industrial     grid_import ener_kWh_lag_168 rmse        11.4
+# 3 industrial     grid_import ener_kWh_lag_24  rmse        12.9
 
 # 2. Continuing the experiment from the previous section, generate seasonal
 # moving averages using the identified seasonalities. Using a validation set
