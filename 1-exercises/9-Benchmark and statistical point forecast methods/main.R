@@ -55,7 +55,55 @@ household_data_with_lags %>%
 # If there is multiple seasonalities, which one has the smallest errors
 # overall ? How does the RMSE error on a tests set for the optimal average
 #  forecasts compare to the persistence forecasts in the previous section ?
-df_sma <- sma_many(household_data_long, "ener_kWh", lags_sma, sma_orders)
+splits <- rsample::initial_time_split(household_data_long, c(0.8))
+df_train <- rsample::training(splits)
+df_test <- rsample::testing(splits)
+
+log_info("Choix d'hyperparamètres pour simple moving average")
+df_train_sma <- sma_many(df_train, "ener_kWh", lags_sma_train, sma_orders_train)
+df_train_sma %>%
+  pivot_longer(names_to = "model", values_to = "forecast", cols = starts_with("ener_kWh_sma")) %>%
+  group_by(across(
+    c(all_of(cols_grouping), "model")
+  )) %>%
+  measure_baseline(
+    yardstick::rmse,
+    test_pred_class = .,
+    truth = ener_kWh,
+    estimate = forecast
+  ) %>%
+  print(width = Inf)
+
+# Meilleurs params
+df_sma_daily_seasonality <- simple_moving_average(household_data_long, "ener_kWh", 24, 6)
+df_sma_weekly_seasonality <- simple_moving_average(household_data_long, "ener_kWh", 24 * 7, 2)
+
+# rmse = 11.7
+df_sma_daily_seasonality %>%
+  pivot_longer(names_to = "model", values_to = "forecast", cols = starts_with("ener_kWh_sma")) %>%
+  group_by(across(
+    c(all_of(cols_grouping), "model")
+  )) %>%
+  measure_baseline(
+    yardstick::rmse,
+    test_pred_class = .,
+    truth = ener_kWh,
+    estimate = forecast
+  ) %>%
+  print(width = Inf)
+# rmse = 11.6
+df_sma_weekly_seasonality %>%
+  pivot_longer(names_to = "model", values_to = "forecast", cols = starts_with("ener_kWh_sma")) %>%
+  group_by(across(
+    c(all_of(cols_grouping), "model")
+  )) %>%
+  measure_baseline(
+    yardstick::rmse,
+    test_pred_class = .,
+    truth = ener_kWh,
+    estimate = forecast
+  ) %>%
+  print(width = Inf)
 
 # 3. Generate a simple 1-step ahead exponential smoothing forecasts for a load
 # forecast time series (prefarably one which has double seasonal patterns,

@@ -5,3 +5,9 @@ lags_to_create <- c(
   24, # daily
   24 * 7 # weekly
 )
+
+sma_orders_train <- 2:6
+lags_sma_train <- c(24, 24 * 7)
+
+### TRAIN/VALIDATION/TESTING ###
+prop_train_val <- c(0.6, 0.2)

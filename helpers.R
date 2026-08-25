@@ -34,23 +34,23 @@ get_energy_unit_config <- function(list_units, path_unit_ref) {
 #' @return dataframe ou list
 lag_many <- function(df, col, lags, should_return_lag_names = FALSE) {
 
-  df_lagged <- df
-  lag_names <- c()
+  df_with_lags <- df
+  cols_lags <- c()
 
   for (lag_length in lags) {
     new_col <- paste0(col, "_lag_", lag_length)
-    lag_names <- c(lag_names, new_col)
+    cols_lags <- c(cols_lags, new_col)
 
-    df_lagged <- df_lagged %>%
+    df_with_lags <- df_with_lags %>%
       mutate(!!sym(new_col) := lag(!!sym(col), lag_length))
     log_debug("Colonne {new_col} créée.")
   }
 
   if (should_return_lag_names) {
-    return(list(df_lagged = df_lagged, lag_names = lag_names))
+    return(list(df_lagged = df_with_lags, lag_names = cols_lags))
   }
 
-  return(df_lagged)
+  return(df_with_lags)
 }
 
 #' Calcule la moyenne glissante saisonnale.
