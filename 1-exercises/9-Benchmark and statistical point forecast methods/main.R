@@ -55,6 +55,7 @@ household_data_with_lags %>%
 # If there is multiple seasonalities, which one has the smallest errors
 # overall ? How does the RMSE error on a tests set for the optimal average
 #  forecasts compare to the persistence forecasts in the previous section ?
+df_sma <- sma_many(household_data_long, "ener_kWh", lags_sma, sma_orders)
 
 # 3. Generate a simple 1-step ahead exponential smoothing forecasts for a load
 # forecast time series (prefarably one which has double seasonal patterns,
