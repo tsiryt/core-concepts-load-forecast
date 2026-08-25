@@ -1,14 +1,15 @@
-here::i_am("1-exercises/9-Benchmark and statistical point forecast methods/main.R")
+current_folder <- "9-Benchmark and statistical point forecast methods"
+here::i_am(glue::glue("1-exercises/{current_folder}/main.R"))
 
 source(here::here("libraries.R"))
 source(here::here("config.R"))
 source(here::here("helpers.R"))
 source(here::here("time_series_analysis.R"))
 
-source(here::here("1-exercises/6-prep_analysis_feature_generation/config.R"))
+source(here::here(glue("1-exercises/{current_folder}/config.R")))
 source(here::here("0.1-get-data/config.R"))
 
-# Take a demand time series. 
+# Take a demand time series.
 ref_units <- get_energy_unit_config(chosen_units, here::here(path_ref_units))
 
 household_data_long <-
@@ -25,7 +26,22 @@ household_data_long <-
 # you found. Calculate the RMSE errors. Which one is lower ? How does this
 # compare to the seasonalities you found ? Compare thse results to the ACCF
 # and PACF for the time series.
-
+household_data_with_lags <- household_data_long %>%
+  group_by(across(all_of(cols_grouping))) %>%
+  lag_many("ener_kWh", lags_to_create) %>%
+  select(utc_timestamp, id_unit, all_of(cols_grouping), starts_with("ener_kWh"))
+household_data_with_lags %>%
+  pivot_longer(names_to = "model", values_to = "forecast", cols = starts_with("ener_kWh_lag")) %>%
+  group_by(across(
+    c(all_of(cols_grouping), "model")
+  )) %>%
+  measure_baseline(
+    yardstick::rmse,
+    test_pred_class = .,
+    truth = ener_kWh,
+    estimate = forecast
+  ) %>%
+  print(width = Inf)
 
 # 2. Continuing the experiment from the previous section, generate seasonal
 # moving averages using the identified seasonalities. Using a validation set

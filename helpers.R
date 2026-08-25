@@ -1,8 +1,8 @@
 #' Cree un df contenant les parametres des time series dont les id sont passes en parametres.
-#' 
+#'
 #' @param list_units int vector.
 #' @param path_unit_ref string.
-#' 
+#'
 #' @return dataframe.
 get_energy_unit_config <- function(list_units, path_unit_ref) {
   df_unit_ref <- read_delim(path_unit_ref, show_col_types = FALSE) %>%
@@ -44,4 +44,19 @@ lag_many <- function(df, col, lags) {
   }
 
   return(df_lagged)
+}
+
+#' Calcule la performance d'un modèle en fonction d'un métrique.
+#'
+#' @param metric fonction du package yardstick.
+#' @param test_pred_class df.
+#' @param truth colonne de test_pred_class
+#' @param estimate colonne de test_pred_class
+#'
+#' @return df.
+measure_baseline <- function(metric, test_pred_class, truth, estimate){
+  info_baseline <- test_pred_class %>%
+    metric(truth = {{truth}}, estimate = {{estimate}})
+
+  return(info_baseline)
 }
