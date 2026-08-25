@@ -76,8 +76,9 @@ simple_moving_average <- function(df, col, lag, order) {
   df_sma <- df_lagged %>%
     rowwise() %>%
     mutate(!!sym(new_col) := mean(c_across(all_of(lag_names)))) %>%
+    ungroup() %>%
     select(all_of(original_cols), !!sym(new_col))
-  log_debug("Colonne {new_col} créée.")
+  log_info("Colonne {new_col} créée.")
 
   return(df_sma)
 }
