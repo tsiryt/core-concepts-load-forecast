@@ -104,6 +104,23 @@ sma_many <- function(df, col, lags, sma_orders) {
   return(df_sma)
 }
 
+ses <- function(df_train, df_test, target, alpha, freq = 24, should_return_col_name = FALSE) {
+
+  fit <- forecast::ets(ts(df_train[[target]], frequency = freq), alpha = alpha, model = "ANZ", opt.crit = "mse")
+
+  new_col <- glue("{target}_ses_{alpha}")
+  prev <- forecast::forecast(fit, h = nrow(df_test)) %>%
+    magrittr::use_series(mean)
+  df_test[[new_col]] <- prev
+  log_info("Simple exponential smoothing : colonne {new_col} créée.")
+
+  if (should_return_col_name) {
+    return(list(df_prev = df_test, col_prev = new_col))
+  }
+
+  return(df_test)
+}
+
 #' Calcule la performance d'un modèle en fonction d'un métrique.
 #'
 #' @param metric fonction du package yardstick.

@@ -23,6 +23,12 @@ splits <- rsample::initial_time_split(household_data_long, c(0.8))
 df_train <- rsample::training(splits)
 df_test <- rsample::testing(splits)
 
+splits_2 <- rsample::initial_validation_time_split(household_data_long, c(0.6, 0.2))
+df_train_2 <- rsample::training(splits_2)
+df_val_2 <- rsample::validation(splits_2)
+df_test_2 <- rsample::testing(splits_2)
+
+
 # 1. Select a demand time series. Analyse the seasonalities. Generate some
 # simple becnhmark forecasts for the test set, including the persistence
 # forecast and seasonal persistence forecasts, one for each seasonality
@@ -113,7 +119,29 @@ df_sma_weekly_seasonality %>%
 # compare to a simple persistence forecast ? Now consider
 # the Holt-Winters-Taylor forecast and perform a grid search for the four
 # parameters phi, lambda, delta, omega.
+log_info("Simple exponential smoothing.")
+df_alpha_rmse <- purrr::map(
+  alphas,
+  function(alpha) {
+    fit <- ses(df_train_2, df_val_2, "ener_kWh", alpha, should_return_col_name = TRUE)
+    df_prev <- fit$df_prev
+    col_prev <- fit$col_prev
 
+    estimate <-
+      yardstick::rmse(
+        df_prev,
+        ener_kWh,
+        !!col_prev
+      ) %>%
+      magrittr::use_series(.estimate)
+    tibble(alpha = alpha, metric = estimate)
+  }
+) %>%
+list_rbind()
+df_alpha_rmse %>%
+  ggplot() +
+  geom_point(aes(x = alpha, y = metric)) +
+  labs(title = "Simple exponential smoothing.", y = "RMSE")
 
 # 4. Investigate a LASSO fit for a linear model. Set the coefficients of a
 # model with a few sine terms, for about N=5 elements, and x in [0, 4pi].

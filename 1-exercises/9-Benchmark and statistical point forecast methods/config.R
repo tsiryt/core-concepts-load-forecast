@@ -7,8 +7,13 @@ lags_to_create <- c(
   24 * 7 # weekly
 )
 
+### TRAIN/VALIDATION/TESTING ###
+prop_train_val <- c(0.6, 0.2)
+
+# SIMPLE MOVING AVERAGE
 sma_orders_train <- 2:6
 lags_sma_train <- c(24, 24 * 7)
 
-### TRAIN/VALIDATION/TESTING ###
-prop_train_val <- c(0.6, 0.2)
+## EXPONENTIAL SMOOTHING
+# Simple exponential smoothing
+alphas <- seq(0.25, 0.975, length.out = 20)
