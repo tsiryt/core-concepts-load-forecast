@@ -45,12 +45,12 @@ household_data_with_lags %>%
     estimate = forecast
   ) %>%
   print(width = Inf)
-# A tibble: 3 x 5
-#   household_type energy_type model            .metric .estimate
-#   <chr>          <chr>       <chr>            <chr>       <dbl>
-# 1 industrial     grid_import ener_kWh_lag_1   rmse         6.70
-# 2 industrial     grid_import ener_kWh_lag_168 rmse        11.4
-# 3 industrial     grid_import ener_kWh_lag_24  rmse        12.9
+# A tibble: 3 x 8
+#   household_type id_household energy_type id_ener_source model            .metric .estimator .estimate
+#   <chr>                 <dbl> <chr>                <dbl> <chr>            <chr>   <chr>          <dbl>
+# 1 residential               5 grid_import             NA ener_kWh_lag_1   rmse    standard       0.239          
+# 2 residential               5 grid_import             NA ener_kWh_lag_168 rmse    standard       0.290          
+# 3 residential               5 grid_import             NA ener_kWh_lag_24  rmse    standard       0.283  
 
 # 2. Continuing the experiment from the previous section, generate seasonal
 # moving averages using the identified seasonalities. Using a validation set
@@ -76,9 +76,9 @@ df_train_sma %>%
 
 # Meilleurs params
 df_sma_daily_seasonality <- simple_moving_average(household_data_long, "ener_kWh", 24, 6)
-df_sma_weekly_seasonality <- simple_moving_average(household_data_long, "ener_kWh", 24 * 7, 2)
+df_sma_weekly_seasonality <- simple_moving_average(household_data_long, "ener_kWh", 24 * 7, 6)
 
-# rmse = 11.7
+# rmse = 0.224
 df_sma_daily_seasonality %>%
   pivot_longer(names_to = "model", values_to = "forecast", cols = starts_with("ener_kWh_sma")) %>%
   group_by(across(
@@ -91,7 +91,7 @@ df_sma_daily_seasonality %>%
     estimate = forecast
   ) %>%
   print(width = Inf)
-# rmse = 11.6
+# rmse = 0.230
 df_sma_weekly_seasonality %>%
   pivot_longer(names_to = "model", values_to = "forecast", cols = starts_with("ener_kWh_sma")) %>%
   group_by(across(
