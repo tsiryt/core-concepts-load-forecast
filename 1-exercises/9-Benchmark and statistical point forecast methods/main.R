@@ -18,7 +18,7 @@ household_data_long <-
     ref_units,
     by = c("household_type", "id_household", "energy_type", "id_ener_source")
   ) %>%
-  filter(!is.na(ener_kWh))
+  filter(!is.na(ener_kWh), utc_timestamp <= date_fin)
 splits <- rsample::initial_time_split(household_data_long, c(0.8))
 df_train <- rsample::training(splits)
 df_test <- rsample::testing(splits)

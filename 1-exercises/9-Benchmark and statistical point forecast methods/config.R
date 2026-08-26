@@ -1,5 +1,6 @@
-chosen_units <- 1
+chosen_units <- 59
 cols_grouping <- c("household_type", "id_household", "energy_type", "id_ener_source", "id_unit")
+date_fin <- ymd_hms("2018-05-01 00:00:00")
 lags_to_create <- c(
   1, # persistence
   24, # daily
