@@ -19,6 +19,9 @@ household_data_long <-
     by = c("household_type", "id_household", "energy_type", "id_ener_source")
   ) %>%
   filter(!is.na(ener_kWh))
+splits <- rsample::initial_time_split(household_data_long, c(0.8))
+df_train <- rsample::training(splits)
+df_test <- rsample::testing(splits)
 
 # 1. Select a demand time series. Analyse the seasonalities. Generate some
 # simple becnhmark forecasts for the test set, including the persistence
@@ -55,9 +58,6 @@ household_data_with_lags %>%
 # If there is multiple seasonalities, which one has the smallest errors
 # overall ? How does the RMSE error on a tests set for the optimal average
 #  forecasts compare to the persistence forecasts in the previous section ?
-splits <- rsample::initial_time_split(household_data_long, c(0.8))
-df_train <- rsample::training(splits)
-df_test <- rsample::testing(splits)
 
 log_info("Choix d'hyperparamètres pour simple moving average")
 df_train_sma <- sma_many(df_train, "ener_kWh", lags_sma_train, sma_orders_train)
@@ -113,6 +113,7 @@ df_sma_weekly_seasonality %>%
 # compare to a simple persistence forecast ? Now consider
 # the Holt-Winters-Taylor forecast and perform a grid search for the four
 # parameters phi, lambda, delta, omega.
+
 
 # 4. Investigate a LASSO fit for a linear model. Set the coefficients of a
 # model with a few sine terms, for about N=5 elements, and x in [0, 4pi].
