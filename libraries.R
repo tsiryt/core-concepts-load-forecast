@@ -8,6 +8,7 @@ library(beepr)
 library(lubridate)
 library(glue)
 library(purrr)
+library(rsample)
 
 conflicted::conflict_prefer("filter", "dplyr")
 conflicted::conflicts_prefer(dplyr::lag)
