@@ -7,6 +7,7 @@ source(here::here("helpers.R"))
 source(here::here("time_series_analysis.R"))
 
 source(here::here(glue("1-exercises/{current_folder}/config.R")))
+source(here::here(glue("1-exercises/{current_folder}/helpers.R")))
 source(here::here("0.1-get-data/config.R"))
 
 # Take a demand time series.
@@ -151,6 +152,18 @@ df_alpha_rmse %>%
 # the LASSO function using different values of the regularisation parameter.
 # How does the fit change as you change the parameter ? How many coefficients
 # are zero (or negligible) ? Use glmnet (R) or sklearn (python)
+withr::with_seed(
+  seed = seed,
+  {
+    sine_coefs <- runif(n = nb_sine_terms, min_coef_sin, max_coef_sin)
+    df_sine_coefs <- tibble(sine_coefs = sine_coefs, sine_order = 1:nb_sine_terms)
+  }
+)
+df_real <- tibble(t = x_values) %>%
+  mutate(
+    y = vec_sum_sinus(t, df_sine_coefs),
+    type = as.factor("real")
+  )
 
 # 6. Try and generate a linear model that fits a demand profile.
 

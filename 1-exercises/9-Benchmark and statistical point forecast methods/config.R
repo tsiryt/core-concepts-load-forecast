@@ -17,3 +17,11 @@ lags_sma_train <- c(24, 24 * 7)
 ## EXPONENTIAL SMOOTHING
 # Simple exponential smoothing
 alphas <- seq(0.25, 0.975, length.out = 20)
+
+## LASSO
+nb_sine_terms <- 5
+nb_sine_values <- 20
+x_values <- seq(0, 4 * pi, length.out = nb_sine_values)
+seed <- 42
+min_coef_sin <- -2
+max_coef_sin <- 2
