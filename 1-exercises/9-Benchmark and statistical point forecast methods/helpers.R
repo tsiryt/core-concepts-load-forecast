@@ -46,3 +46,12 @@ make_sinus_data <- function(df_sine_coefs, nb_sine_values, min_x_value, max_x_va
     )
   return(df)
 }
+
+fit_glm_model <- function(df_real, glm_spec, formula, penalty) {
+  glm_fit <- glm_spec %>%
+    parsnip::set_args(penalty = penalty) %>%
+    parsnip::fit(formula, data = df_real)
+  log_info("Fit du modèle sinusoidal avec lambda = {penalty}")
+
+  return(glm_fit)
+}

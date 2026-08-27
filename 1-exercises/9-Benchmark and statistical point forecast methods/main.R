@@ -157,17 +157,10 @@ withr::with_seed(
   {
     sine_coefs <- runif(n = nb_sine_terms, min_coef_sin, max_coef_sin)
     df_sine_coefs <- tibble(sine_coefs = sine_coefs, sine_order = 1:nb_sine_terms)
-    df_real <- make_sinus_data(df_sine_coefs, nb_sine_values, min_x_value, max_x_value)
+    df_train <- make_sinus_data(df_sine_coefs, nb_sine_values, min_x_value, max_x_value) %>%
+      sine_many("t", 1:nb_sine_terms_fit)
   }
 )
-
-log_info("Fit glm model a la somme de sinus")
-df_test <- sine_many(df_real, "t", 1:nb_sine_terms_fit)
-lm_form <- tidyformula::tidyformula(y ~ starts_with("t_sin"), data = df_test)
-glm_spec_init <- parsnip::linear_reg(penalty = 1) %>%
-  parsnip::set_engine("glmnet")
-glm_fit_init <- glm_spec_init %>%
-  parsnip::fit(lm_form, data = df_test)
 withr::with_seed(
   seed = seed_test,
   {
@@ -176,8 +169,23 @@ withr::with_seed(
 
   }
 )
-log_info("Predict somme de sinus")
-df_prev <- augment(glm_fit_init, df_test) %>%
+splits_lm <- rsample::make_splits(
+  x = df_train,
+  assessment = df_test
+)
+
+log_info("Fit glm model a la somme de sinus, lambda fixe")
+
+lm_form <- tidyformula::tidyformula(y ~ starts_with("t_sin"), data = training(splits_lm))
+# mixture = 1 permet d'avoir un modèle LASSO pur
+glm_spec <- parsnip::linear_reg(mixture = 1) %>%
+  parsnip::set_engine("glmnet")
+
+
+glm_fit_init <- fit_glm_model(training(splits_lm), glm_spec, lm_form, 1)
+
+log_info("Predict somme de sinus, lambda fixe")
+df_prev <- augment(glm_fit_init, testing(splits_lm)) %>%
   select(t, y, .pred) %>%
   rename(real = y, prev = .pred) %>%
   pivot_longer(names_to = "type", values_to = "valeur", cols = c("real", "prev"))
@@ -185,6 +193,33 @@ df_prev %>%
   ggplot() +
   geom_point(aes(x = t, y = valeur, color = type)) +
   labs(title = "Regression lineaire sur la somme de sinus.", subtitle = glue("Nb de termes initiaux : {nb_sine_terms}. Nb de termes du modèle : {nb_sine_terms_fit}"))
+
+
+glm_spec_tune <- parsnip::linear_reg(mixture = 1, penalty = tune()) %>%
+  parsnip::set_engine("glmnet")
+grid_values <- tibble(penalty = lambdas)
+metrics <- yardstick::metric_set(yardstick::rmse, yardstick::mape)
+ctrl <- tune::control_grid(verbose = FALSE, save_pred = TRUE)
+grid_search <- tune_grid(
+  glm_spec_tune,
+  preprocessor = lm_form,
+  resamples = rsample::manual_rset(list(splits_lm), c("split 0")),
+  grid = grid_values,
+  metrics = metrics,
+  control = ctrl
+)
+best_glm_params <- tune::select_best(grid_search, metric = "rmse")
+best_glm_model <- tune::finalize_model(glm_spec_tune, best_glm_params)
+best_glm_model_fit <- parsnip::fit(best_glm_model, lm_form, data = df_train)
+df_prev_final <- augment(best_glm_model_fit, testing(splits_lm)) %>%
+  select(t, y, .pred) %>%
+  rename(real = y, prev = .pred) %>%
+  pivot_longer(names_to = "type", values_to = "valeur", cols = c("real", "prev"))
+df_prev_final %>%
+  ggplot() +
+  geom_point(aes(x = t, y = valeur, color = type)) +
+  labs(title = "Regression lineaire sur la somme de sinus.", subtitle = glue("Nb de termes initiaux : {nb_sine_terms}. Nb de termes du modèle : {nb_sine_terms_fit}"))
+
 
 # 6. Try and generate a linear model that fits a demand profile.
 

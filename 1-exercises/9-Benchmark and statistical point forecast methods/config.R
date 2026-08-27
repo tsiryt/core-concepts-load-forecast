@@ -28,3 +28,4 @@ max_coef_sin <- 2
 min_x_value <- 0
 max_x_value <- 4 * pi
 nb_sine_terms_fit <- 50
+lambdas <- seq(1e-4, 2, length.out = 100)
