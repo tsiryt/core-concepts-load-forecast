@@ -157,14 +157,34 @@ withr::with_seed(
   {
     sine_coefs <- runif(n = nb_sine_terms, min_coef_sin, max_coef_sin)
     df_sine_coefs <- tibble(sine_coefs = sine_coefs, sine_order = 1:nb_sine_terms)
-    x_values <- runif(n = nb_sine_values, min_x_value, max_x_value)
+    df_real <- make_sinus_data(df_sine_coefs, nb_sine_values, min_x_value, max_x_value)
   }
 )
-df_real <- tibble(t = x_values) %>%
-  mutate(
-    y = vec_sum_sinus(t, df_sine_coefs),
-    type = as.factor("real")
-  )
+
+log_info("Fit glm model a la somme de sinus")
+df_test <- sine_many(df_real, "t", 1:nb_sine_terms_fit)
+lm_form <- tidyformula::tidyformula(y ~ starts_with("t_sin"), data = df_test)
+glm_spec_init <- parsnip::linear_reg(penalty = 1) %>%
+  parsnip::set_engine("glmnet")
+glm_fit_init <- glm_spec_init %>%
+  parsnip::fit(lm_form, data = df_test)
+withr::with_seed(
+  seed = seed_test,
+  {
+    df_test <- make_sinus_data(df_sine_coefs, nb_sine_values, min_x_value, max_x_value) %>%
+      sine_many("t", 1:nb_sine_terms_fit)
+
+  }
+)
+log_info("Predict somme de sinus")
+df_prev <- augment(glm_fit_init, df_test) %>%
+  select(t, y, .pred) %>%
+  rename(real = y, prev = .pred) %>%
+  pivot_longer(names_to = "type", values_to = "valeur", cols = c("real", "prev"))
+df_prev %>%
+  ggplot() +
+  geom_point(aes(x = t, y = valeur, color = type)) +
+  labs(title = "Regression lineaire sur la somme de sinus.", subtitle = glue("Nb de termes initiaux : {nb_sine_terms}. Nb de termes du modèle : {nb_sine_terms_fit}"))
 
 # 6. Try and generate a linear model that fits a demand profile.
 

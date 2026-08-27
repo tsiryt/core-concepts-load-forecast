@@ -22,7 +22,9 @@ alphas <- seq(0.25, 0.975, length.out = 20)
 nb_sine_terms <- 5
 nb_sine_values <- 20
 seed <- 42
+seed_test <- 13
 min_coef_sin <- -2
 max_coef_sin <- 2
 min_x_value <- 0
 max_x_value <- 4 * pi
+nb_sine_terms_fit <- 50
