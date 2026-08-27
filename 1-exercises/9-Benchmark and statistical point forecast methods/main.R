@@ -219,7 +219,33 @@ df_prev_final %>%
   ggplot() +
   geom_point(aes(x = t, y = valeur, color = type)) +
   labs(title = "Regression lineaire sur la somme de sinus.", subtitle = glue("Nb de termes initiaux : {nb_sine_terms}. Nb de termes du modèle : {nb_sine_terms_fit}"))
-
+df_estimated_coefs <- best_glm_model_fit %>%
+  tidy() %>%
+  filter(estimate != 0)
+df_sine_coefs
+df_estimated_coefs
+# r$> df_sine_coefs                                                                         
+# # A tibble: 5 x 2                                                                         
+#   sine_coefs sine_order                                                                   
+#        <dbl>      <int>                                                                   
+# 1      1.66           1                                                                   
+# 2      1.75           2                                                                   
+# 3     -0.855          3                                                                   
+# 4      1.32           4                                                                   
+# 5      0.567          5                                                                   
+# 
+# r$> df_estimated_coefs                                                                    
+# # A tibble: 8 x 3                                                                         
+#   term         estimate penalty                                                           
+#   <chr>           <dbl>   <dbl>                                                           
+# 1 (Intercept) -0.00892   0.0001                                                           
+# 2 t_sin_1      1.65      0.0001                                                           
+# 3 t_sin_2      1.66      0.0001                                                           
+# 4 t_sin_3     -0.776     0.0001                                                           
+# 5 t_sin_4      1.31      0.0001                                                           
+# 6 t_sin_5      0.505     0.0001                                                           
+# 7 t_sin_27     0.00159   0.0001                                                           
+# 8 t_sin_31     0.000689  0.0001   
 
 # 6. Try and generate a linear model that fits a demand profile.
 
