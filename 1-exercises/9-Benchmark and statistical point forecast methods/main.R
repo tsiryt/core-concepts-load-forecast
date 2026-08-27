@@ -159,6 +159,7 @@ withr::with_seed(
     df_sine_coefs <- tibble(sine_coefs = sine_coefs, sine_order = 1:nb_sine_terms)
   }
 )
+x_values <- runif(n = nb_sine_values, min_x_value, max_x_value)
 df_real <- tibble(t = x_values) %>%
   mutate(
     y = vec_sum_sinus(t, df_sine_coefs),

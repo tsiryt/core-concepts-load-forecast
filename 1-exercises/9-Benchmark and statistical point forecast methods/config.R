@@ -21,7 +21,8 @@ alphas <- seq(0.25, 0.975, length.out = 20)
 ## LASSO
 nb_sine_terms <- 5
 nb_sine_values <- 20
-x_values <- seq(0, 4 * pi, length.out = nb_sine_values)
 seed <- 42
 min_coef_sin <- -2
 max_coef_sin <- 2
+min_x_value <- 0
+max_x_value <- 4 * pi
