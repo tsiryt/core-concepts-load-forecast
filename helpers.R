@@ -43,7 +43,7 @@ lag_many <- function(df, col, lags, should_return_lag_names = FALSE) {
 
     df_with_lags <- df_with_lags %>%
       mutate(!!sym(new_col) := lag(!!sym(col), lag_length))
-    log_debug("Colonne {new_col} créée.")
+    log_info("Colonne {new_col} créée.")
   }
 
   if (should_return_lag_names) {
