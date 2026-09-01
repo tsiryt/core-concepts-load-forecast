@@ -123,15 +123,44 @@ ses <- function(df_train, df_test, target, alpha, freq = 24, should_return_col_n
 
 #' Calcule la performance d'un modèle en fonction d'un métrique.
 #'
-#' @param metric fonction du package yardstick.
+#' @param metrics fonction ou liste de fonctions du package yardstick.
 #' @param test_pred_class df.
 #' @param truth colonne de test_pred_class
 #' @param estimate colonne de test_pred_class
 #'
 #' @return df.
-measure_baseline <- function(metric, test_pred_class, truth, estimate){
-  info_baseline <- test_pred_class %>%
-    metric(truth = {{truth}}, estimate = {{estimate}})
+measure_baseline <- function(metrics, test_pred_class, truth, estimate){
+
+  if (length(metrics) == 1) {
+    metrics <- c(metrics)
+  }
+  info_baseline <- metrics %>%
+    purrr::map(function(metric) metric(test_pred_class, truth = {{truth}}, estimate = {{estimate}})) %>%
+    purrr::list_rbind()
 
   return(info_baseline)
+}
+
+make_calendar <- function(df, date_col, time_origin = NULL) {
+
+  if (is.null(time_origin)) {
+    time_origin <- df %>%
+      pull({{date_col}}) %>%
+      min()
+    log_warn("La date d'origine n'est pas définie. On utilise {time_origin}, la date minimale du df.")
+  }
+  df_with_calendar <- df %>%
+    mutate(
+      is_weekend = wday({{date_col}}, week_start = 1) %in% c(6, 7),
+      toy = yday({{date_col}}) / 365,
+      heure = hour({{date_col}}),
+      jour = wday({{date_col}}, week_start = 1),
+      mois = month({{date_col}}),
+      duration_since_origin = as.numeric({{date_col}} - time_origin) / 3600
+    )
+
+  date_col_name <- rlang::englue("{{date_col}}")
+  log_info("Variables calendaires créées à partir de {date_col_name}")
+
+  return(df_with_calendar)
 }
