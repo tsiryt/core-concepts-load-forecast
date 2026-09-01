@@ -26,7 +26,7 @@ plot_correlation_fun <- function(data, vars, time_index, lag_max = 7, rows = NUL
   for(i in 1:length(vars)){
     glist[[i]] <- data%>%
       as_tsibble(index = .data[[time_index]])%>%
-      correlation_function(.data[[vars[i]]],lag_max = lag_max)%>%
+      correlation_function(.data[[vars[i]]], lag_max = lag_max)%>%
       autoplot() + ggtitle(vars[i])
   }
   glist[["nrow"]] = rows
