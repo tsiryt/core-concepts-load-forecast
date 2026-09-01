@@ -1,6 +1,7 @@
 library(feasts)
 library(tsibble)
 library(cowplot)
+library(patchwork)
 
 #' Trace des ACF/PACF plot pour plusieurs colonnes d'un df.
 #' 
@@ -30,4 +31,14 @@ plot_correlation_fun <- function(data, vars, time_index, lag_max = 7, rows = NUL
   }
   glist[["nrow"]] = rows
   do.call(cowplot::plot_grid, glist)
+}
+
+plot_correlation <- function(...) {
+
+  plot_acf <- plot_correlation_fun(..., type = "acf")
+  plot_pacf <- plot_correlation_fun(..., type = "pacf")
+
+  plot_acf_pacf <- plot_acf / plot_pacf
+
+  return(plot_acf_pacf)
 }
