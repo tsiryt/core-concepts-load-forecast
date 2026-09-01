@@ -6,6 +6,12 @@ lags_to_create <- c(
   24, # daily
   24 * 7 # weekly
 )
+file_gefcom <- "C:/Users/rasen/Documents/r-projects/data/GEFCom2014/GEFCom2014 Data/GEFCom2014-L_V2/Load/Task 1/L1-train.csv"
+
+### GEFCOM ###
+# on se limite a 3 ans de données
+date_deb_analyse <- lubridate::ymd_hms("2007-01-01 01:00:00")
+date_fin_analyse <- date_fin_raw
 
 ### TRAIN/VALIDATION/TESTING ###
 prop_train_val <- c(0.6, 0.2)
