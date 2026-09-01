@@ -13,6 +13,11 @@ file_gefcom <- "C:/Users/rasen/Documents/r-projects/data/GEFCom2014/GEFCom2014 D
 date_deb_analyse <- lubridate::ymd_hms("2007-01-01 01:00:00")
 date_fin_analyse <- date_deb_analyse + dyears(3)
 
+# lags avec un coef de correlation > 168
+lags_current_day <- c(24)
+lags_weekly <- c(144, 168)
+lags_to_create_gefcom <- c(lags_current_day, lags_weekly)
+
 ### TRAIN/VALIDATION/TESTING ###
 prop_train_val <- c(0.6, 0.2)
 
