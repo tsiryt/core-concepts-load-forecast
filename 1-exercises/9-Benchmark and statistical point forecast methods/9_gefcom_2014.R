@@ -17,7 +17,8 @@ df_gefcom$datetime <- timeline
 df_covars <- df_gefcom %>%
   filter(datetime >= date_deb_analyse, datetime <= date_fin_analyse) %>%
   rename_with(str_to_lower) %>%
-  select(datetime, load, starts_with("w"))
+  select(datetime, load, starts_with("w")) %>%
+  make_calendar(datetime)
 
 plot_correlation(
   df_covars,
