@@ -164,3 +164,24 @@ make_calendar <- function(df, date_col, time_origin = NULL) {
 
   return(df_with_calendar)
 }
+
+compute_temp_seuil <- function(df, temp_col, temp_seuil) {
+  temp_col_name <- rlang::englue("{{temp_col}}")
+  col_seuil_inf <- glue("{temp_col_name}_seuil_inf")
+  col_seuil_sup <- glue("{temp_col_name}_seuil_sup")
+  df_with_ts <- df %>%
+    mutate(
+      !!sym(col_seuil_inf) := if_else({{temp_col}} <= temp_seuil, {{temp_col}}, temp_seuil),
+      !!sym(col_seuil_sup) := if_else({{temp_col}} >= temp_seuil, {{temp_col}}, temp_seuil)
+    )
+
+  log_info("Calcul des températures seuillées {col_seuil_inf} / {col_seuil_sup} avec température seuil : {temp_seuil} à partir de la colonne {temp_col_name}")
+  return(df_with_ts)
+}
+
+compute_weather_features <- function(df, temp_col, temp_seuil) {
+  df_with_weather <- df %>%
+    compute_temp_seuil({{temp_col}}, temp_seuil)
+
+  return(df_with_weather)
+}
