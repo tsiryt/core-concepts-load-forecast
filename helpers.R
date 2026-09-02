@@ -151,7 +151,7 @@ make_calendar <- function(df, date_col, time_origin = NULL) {
   }
   df_with_calendar <- df %>%
     mutate(
-      is_weekend = wday({{date_col}}, week_start = 1) %in% c(6, 7),
+      is_weekend = if_else(wday({{date_col}}, week_start = 1) %in% c(6, 7), 1, 0),
       toy = yday({{date_col}}) / 365,
       heure = hour({{date_col}}),
       jour = wday({{date_col}}, week_start = 1),
